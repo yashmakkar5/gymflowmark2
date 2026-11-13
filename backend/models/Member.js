@@ -80,6 +80,10 @@ const memberSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Trainer',
     },
+    avatarUrl: {
+      type: String,
+      default: '',
+    },
     notes: {
       type: String,
       trim: true,

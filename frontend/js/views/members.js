@@ -157,7 +157,9 @@ export const MembersView = {
         <tr>
           <td>
             <div class="member-cell">
-              <div class="member-avatar">${m.name.charAt(0)}</div>
+              <div class="member-avatar" style="${m.avatarUrl ? `background-image: url('${m.avatarUrl}'); background-size: cover; background-position: center; color: transparent;` : ''}">
+                ${m.avatarUrl ? '' : m.name.charAt(0)}
+              </div>
               <div class="member-meta">
                 <span class="member-name">${m.name}</span>
                 <span class="member-code">${m.memberCode || 'MEMBER'}</span>

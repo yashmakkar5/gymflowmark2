@@ -349,3 +349,30 @@ exports.renewMembership = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Failed to renew membership.', error: err.message });
   }
 };
+
+exports.uploadAvatar = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No image file uploaded.' });
+    }
+
+    const member = await Member.findOne({ _id: req.params.id, gymId: req.user.gymId });
+    if (!member) {
+      return res.status(404).json({ success: false, message: 'Member not found.' });
+    }
+
+    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+    member.avatarUrl = avatarUrl;
+    await member.save();
+
+    return res.json({
+      success: true,
+      message: 'Member avatar uploaded successfully.',
+      avatarUrl,
+      data: member,
+    });
+  } catch (err) {
+    console.error('uploadAvatar error:', err);
+    return res.status(500).json({ success: false, message: 'Failed to upload avatar.', error: err.message });
+  }
+};

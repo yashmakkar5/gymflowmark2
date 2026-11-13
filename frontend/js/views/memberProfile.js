@@ -61,8 +61,12 @@ export const MemberProfileView = {
 
         <div class="page-header" style="align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 20px;">
           <div style="display: flex; align-items: center; gap: 16px;">
-            <div class="member-avatar" style="width: 52px; height: 52px; font-size: 20px;">
-              ${m.name.charAt(0)}
+            <div class="member-avatar" style="width: 56px; height: 56px; font-size: 20px; position: relative; border-radius: 50%; overflow: visible; ${m.avatarUrl ? `background-image: url('${m.avatarUrl}'); background-size: cover; background-position: center; color: transparent;` : ''}">
+              ${m.avatarUrl ? '' : m.name.charAt(0)}
+              <label for="member-avatar-upload" style="position: absolute; bottom: -2px; right: -2px; background: var(--surface-elevated); border: 1px solid var(--border); border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); box-shadow: 0 2px 5px rgba(0,0,0,0.4);" title="Upload Photo (Multer)">
+                ${Icons.edit}
+              </label>
+              <input type="file" id="member-avatar-upload" accept="image/*" style="display: none;" />
             </div>
             <div>
               <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
@@ -362,6 +366,36 @@ export const MemberProfileView = {
         this.currentTab = tab.dataset.tab;
         this.renderTabContent(root);
       });
+    });
+
+    // Avatar file upload (Multer)
+    const avatarInput = root.querySelector('#member-avatar-upload');
+    avatarInput?.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      try {
+        Toast.info('Uploading photo...');
+        const token = Api.getToken();
+        const res = await fetch(`/api/members/${memberId}/avatar`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Upload failed');
+
+        Toast.success('Profile avatar updated successfully!');
+        this.loadData(root.parentElement, memberId);
+      } catch (err) {
+        Toast.error(err.message || 'Avatar upload failed');
+      }
     });
 
     // Checkin button

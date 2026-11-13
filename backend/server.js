@@ -48,6 +48,10 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Serve uploaded static assets (Multer file destination)
+const uploadsPath = path.join(__dirname, '../uploads');
+app.use('/uploads', express.static(uploadsPath));
+
 // Serve static frontend assets
 const frontendPath = path.join(__dirname, '../frontend');
 app.use(express.static(frontendPath));

@@ -88,6 +88,22 @@ async function runTests() {
     assert.strictEqual(memberProfile.data.data.member.name, 'Sunil Gavaskar');
     console.log('   ✅ Member profile CRM loaded with attendance and payment history.');
 
+    // 5b. Testing Multer Avatar Upload
+    console.log('5b. Testing Multer Member Avatar Upload (/api/members/:id/avatar) ...');
+    const form = new FormData();
+    const fakeImage = new Blob([Buffer.from('fake image bytes')], { type: 'image/png' });
+    form.append('avatar', fakeImage, 'test-avatar.png');
+
+    const avatarUploadRes = await fetch(`${BASE_URL}/members/${memberId}/avatar`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token1}` },
+      body: form,
+    });
+    const avatarData = await avatarUploadRes.json();
+    assert.strictEqual(avatarUploadRes.status, 200);
+    assert.ok(avatarData.avatarUrl.includes('/uploads/avatars/'));
+    console.log(`   ✅ Multer image upload verified: ${avatarData.avatarUrl}`);
+
     // 6. Fast Attendance Toggle
     console.log('6. Testing /api/attendance/toggle ...');
     const toggleIn = await request(
